@@ -8,17 +8,18 @@
 \usepackage{mathptmx}
 \usepackage{graphicx}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{mathtools}
 \newcommand{\blue}[1]{\textcolor{RoyalBlue}{#1}}
 \newcommand{\fillme}[1]{\blue{\texttt{[Insert #1]}}}
 \newcommand{\instructions}[1]{\blue{\textit{#1}}}
 % uncomment the next two lines if you want the instructions to disappear.
-%\renewcommand{\instructions}[1]{}
-%\renewcommand{\fillme}[1]{}
+\renewcommand{\instructions}[1]{}
+\renewcommand{\fillme}[1]{}
 
 \begin{document}
 
-\title{CS446 Class Project Proposal \fillme{Your Project}}
-\author{\fillme{Your Names (Your NetIDs)}}
+\title{CS446 Class Project Proposal - Stockit}
+\author{dmcquil2@illinois.edu, mcconne7@illinois.edu}
 \maketitle
 
 
@@ -42,17 +43,45 @@ The template for the final report is at
 for the pdf)
 }
 \section*{Task description}
+  Stockit is an algorithm developed to forecast stock price changes from
+  a given news article body. A successful algorithm will be one that provides
+  a statistically significant advantage to predicting the percentage change
+  in a stock price.
 \instructions{Describe the task you want to tackle in your project.}
 
 \section*{Background}
 \instructions{Has there been any prior work on this task? If so,
   provide references where available}
 
-\section*{Data and evaluation}
+\section*{Data}
+  Our data will consist of a collection of news articles and historic
+  stock price information. News articles were gathered using a web crawler.
+  Historic stock prices were gathered using the
+  \href{https://developer.yahoo.com/yql}{yql api}.
+  
+\section*{Assumptions}
+  \begin{itemize}
+  \item News articles lead stock price changes.
+  \item A given news article relates to specifically $n$ publically traded companies.
+  \end{itemize}
+  Note: These assumptions are not necessarily accurate.
+  
 \instructions{Do you have data to train and test your system on? How
   will you evaluate your system?}
+  
+\section*{Evalutation}
 
-\section*{Your approach} 
+
+\section*{Our approach}
+  We will separate our news articles into test and training sets. For the training news
+  articles, we will find the $n$ companies referred to in the article by taking a given
+  list of companies and checking it is "matched" in the article. For example, we will
+  take company names and their aliases and check for text similarity score for a given
+  document. Once an article is mapped to a document, we will look up the $\%\delta$ in
+  the stock price on the day the article was published. Accordingly, we will remove references
+  to the company from the body of the document. For given test document the $\%\delta$
+  will be calculated by using the K nearest documents using text similarity
+  and taking the median $\%\delta$ of those documents.
 \instructions{Describe how you want to tackle this task}
 
 \section*{Your to-do list}
@@ -60,13 +89,13 @@ for the pdf)
   project: who will do what? Set yourself deadlines. Here are a few
   items that might appear on your to-do list}
 \begin{enumerate}
-\item \fillme{...do you have data?}
-\item \fillme{...do you know related work? (have you got the
-    references  for your .bib file?)}
-\item \fillme{...what algorithm will you use? do you need to implement
-    this yourself, or will you use an off-the-shelf package?} 
-\item \fillme{...what experiments do you plan to run?}
-\item \fillme{...and don't forget to allocate time for the writeup!} 
+\item Retrieve news articles and historic stock price data.
+\item We have not currently looked up any related work.
+\item We will use am off the shelf KNN implementation.
+\item We plan to check the validity of the algorithm and also explore some possible
+  extensions. What if document map to an industry instead and stock are also related
+  to industries?
+\item Finish write up.
 \end{enumerate}
 
 \section*{Bibliography}
