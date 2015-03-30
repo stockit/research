@@ -34,7 +34,7 @@ To make the instructions disappear, please uncomment the
 {\tt$\backslash$renewcommand\{$\backslash$instructions\}[1]\{\}}\\
 %{\tt$\backslash$renewcommand\{$\backslash$fillme\}[1]\{\}}\\
 \end{center}
-lines in the preamble (just above  {\tt $\backslash$begin\{document\}} of this .tex file) by removing the leading \% marks, 
+lines in the preamble (just above {\tt $\backslash$begin\{document\}} of this .tex file) by removing the leading \% marks,
 recompile (run \LaTeX again) and submit the PDF on Compass.\\
 The template for the final report is at
 \url{http://courses.engr.illinois.edu/cs446/Projects/CS446proj.tex}
@@ -50,6 +50,13 @@ for the pdf)
 \instructions{Describe the task you want to tackle in your project.}
 
 \section*{Background}
+  There have been other attempts to predict stock market prices using
+  machine learning. For example,
+  \href{http://ailab.arizona.edu/intranet/papers/Textual\%20Analysis\%20of\%20Stock\%20Market.pdf}
+    {Textual Analysis of Stock Market Prediction Using Financial News Articles}
+  approaches this challenge from a very similar direction. There research
+  has shown that text information can provide a 1\% to 2\% increase in accuracy of
+  predicting the change in a stock price than a purely regressive model ~\cite{arizona}.
 \instructions{Has there been any prior work on this task? If so,
   provide references where available}
 
@@ -58,19 +65,20 @@ for the pdf)
   stock price information. News articles were gathered using a web crawler.
   Historic stock prices were gathered using the
   \href{https://developer.yahoo.com/yql}{yql api}.
-  
+
 \section*{Assumptions}
   \begin{itemize}
   \item News articles lead stock price changes.
   \item A given news article relates to specifically $n$ publically traded companies.
   \end{itemize}
   Note: These assumptions are not necessarily accurate.
-  
+
 \instructions{Do you have data to train and test your system on? How
   will you evaluate your system?}
-  
-\section*{Evalutation}
 
+\section*{Evalutation}
+  We will evaluate our system by measuring the accuracy of the forecasted
+  stock prices on test data.
 
 \section*{Our approach}
   We will separate our news articles into test and training sets. For the training news
@@ -84,7 +92,7 @@ for the pdf)
   and taking the median $\%\delta$ of those documents.
 \instructions{Describe how you want to tackle this task}
 
-\section*{Your to-do list}
+\section*{To-Do list}
 \instructions{Get started by making a to-do list. If you have a group
   project: who will do what? Set yourself deadlines. Here are a few
   items that might appear on your to-do list}
@@ -99,9 +107,8 @@ for the pdf)
 \end{enumerate}
 
 \section*{Bibliography}
-\instructions{If you need references for the background section, don't forget to create your own .bib file, and run {\tt bibtex}. If you call your bibliography {\tt mybib.bib} and put it in the same directory as this {\tt .tex} file, add {\tt$\backslash$bibliography\{mybib\}} before {\tt$\backslash$end\{document\}}
-}
-\bibliographystyle{plain}  
+\bibliography{CS446projProposal}{}
+\bibliographystyle{plain}
 \end{document}
 
 %%% Local Variables:

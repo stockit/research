@@ -12,6 +12,12 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+project_proposal/CS446projProposal.aux
+project_proposal/CS446projProposal.dvi
+project_proposal/CS446projProposal.out
+project_proposal/CS446projProposal.pdf
+project_proposal/CS446projProposal.bbl
+project_proposal/CS446projProposal.blg
 
 # Scala-IDE specific
 .scala_dependencies
