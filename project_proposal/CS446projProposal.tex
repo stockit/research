@@ -61,10 +61,19 @@ for the pdf)
   provide references where available}
 
 \section*{Data}
-  Our data will consist of a collection of news articles and historic
-  stock price information. News articles were gathered using a web crawler.
-  Historic stock prices were gathered using the
-  \href{https://developer.yahoo.com/yql}{yql api}.
+  For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets
+
+  \begin{itemize}
+  	\item Stock history
+		This dataset will represent the historical stock data going back to 2001 for all stocks available on Yahoo's financial data platform (~24,000 stocks). This historical information was retrieved via the  \href{https://developer.yahoo.com/yql}{Yahoo data platform}.
+	\item Stocks
+		This dataset is a listing of all stocks currently available on the Yahoo financial data platform and also the categories and indexes they are associated with.
+	\item News Articles
+		The dataset is a collection of news articles that have been retrieved from various website via web page scraping.  Currently this dataset is made up of content from:
+		\begin{itemize}
+			\item \href{http://www.newsmax.com/archives/}{newsmax.com}
+		\end{itemize}
+  \end{itemize}
 
 \section*{Assumptions}
   \begin{itemize}
