@@ -1,0 +1,151 @@
+\documentclass[11pt,letterpaper]{article}
+\oddsidemargin 0in
+\evensidemargin 0in
+\textwidth 6.5in
+\topmargin -0.5in
+\textheight 9.0in
+\usepackage{hyperref}
+\usepackage{mathptmx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{natbib} % for references
+\usepackage[usenames,dvipsnames]{xcolor}
+\newcommand{\blue}[1]{\textcolor{RoyalBlue}{#1}}
+\newcommand{\fillme}[1]{\blue{\texttt{[Insert #1]}}}
+\newcommand{\instructions}[1]{\blue{\textit{#1}}}
+
+\begin{document}
+
+\title{CS446 Class Project Proposal - Stockit}
+\author{dmcquil2@illinois.edu, mcconne7@illinois.edu}
+\maketitle
+
+
+
+\instructions{If you are taking CS446 for 4 hours credit, you need to do a research project. This is a template for the project report that you need to hand in at the end of the semester, but it should also help you guide you as you work on the project. In particular, you should work on the Introduction, Background, Task and Data sections before you perform any experiments yourself. Note that you cannot perform any machine learning experiments without having suitable test and training data, or knowing what to evaluate.}
+
+\begin{abstract}
+\instructions{Very briefly, summarize your task, your model and your main results}
+\end{abstract}
+
+
+\section{Introduction} 
+\label{sec:introduction}
+%\instructions{This should be a brief outline of the paper -- use plain English, no math. Note that you should be able to write most of this section before you actually perform any experiments. First, define and motivate your task: what are you trying to learn, and why is this an important task? Second, define what kind of a machine learning problem this requires you to solve (binary/multiclass classification, ranking, ....). What is an appropriate baseline model for this task? What kind of model are you proposing? 
+%Briefly summarize the assumptions your model makes. Finally, describe the hypotheses you wish to test. These are typically statements of the form ``we expect model/features A to perform better on this task than model/features B''.
+%Outline how your experiments will evaluate these hypotheses (comparisons of different models, ablation studies, learning curves, oracle experiments... ). }
+We would like to create an algorithm that would be able to forecast stock price changes from a given news article content. This would help to test ways that one could predict a stock trend and could act as a hint as to whether a stock is about to increase or decrease.  We will be using a text search algorithm to rank the tickers on document relevance.  Then we will create a kNN implementation to cluster the documents according to a positive or negative increase in the mentioned stock. \\  \\
+Our null hypothesis is that we would like to prove that calculating stock trends using news articles is more accurate than observing the stocks history.
+
+\section{Background}
+\label{sec:background}
+%\instructions{Summarize and discuss related work that you are building on: this requires you to find, read and cite a few research papers. This is also something you can get started on as soon as you have settled on a task.} 
+  There have been other attempts to predict stock market prices using machine learning. For example, \href{http://ailab.arizona.edu/intranet/papers/Textual\%20Analysis\%20of\%20Stock\%20Market.pdf}{Textual Analysis of Stock Market Prediction Using Financial News Articles} approaches this challenge from a very similar direction. Their research has shown that text information can provide a 1\% to 2\% increase in accuracy of predicting the change in a stock price than a purely regressive model ~\cite{arizona}
+ 
+\section{Task and Data}
+\label{sec:taskAndData}
+\instructions{Now describe the task and data in more detail.}
+
+\subsection{The Task}
+\label{sec:task}
+%\instructions{Now, try to formalize your task as a classification/ranking/... problem. Introduce mathematical/formal notation as necessary. How do you evaluate models, or measure success?}
+In order to predict stock trends we will be using a k nearest neighbor algorithm that will cluster the documents.  This algorithm will first generate a similarity metric for all documents.  The similarity between documents will be calculated using the following scoring function as described in the Lucene Similarity implementation ~\cite{similarity}
+\[
+	sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
+\]
+where
+\begin{description}
+	\item[\(tf(t \in d_j)\)] : this is the term frequency of a term in document \(d_j\) where \(t\) is a term present in document \(d_i\)
+	\item[\(idf(t)\)] : this is the inverse document frequency for a given term in a document as defined as
+	\[
+		idf(t) = 1 + \log \left[ \frac{numDocs}{docFreq(t) + 1} \right]
+	\]
+	\item[\(coord(q,d_j)\)] : this is a score based on how many of the query terms are found in a given document \(d_j\)
+	\[
+		coord(q,d_j) = \frac{\text{\# of query terms found in } d_j }{\text{\# of query terms}}
+	\]
+\end{description}
+
+
+\subsection{The Data}
+\label{sec:data}
+%\instructions{Describe the data you use to train and evaluate your models. Describe where you got it from (include references/citations to published works, or URLs!). Describe and give examples for the features that you have access to.} 
+  For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
+To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\  
+Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using cosine similarity \\ \\ 
+  \[ 
+  	score(q,d) = cosine\_similarity(q,d) = \frac{ V(q) \cdot V(d) }{ | V(q) | | V(d) | } 
+\]
+where \(V\) is a mapping function that translates both the query and document to a search vector \\ \\
+ To find the most relevant ticker we will find the ticker for each article that has the highest correlated score.  This will give us a new composite dataset which we will use as our training and test data for our algorithm.
+  \begin{itemize}
+  	\item \textbf{Stock history}
+		- This dataset will represent the historical stock data going back to 2001 for all stocks available on Yahoo's financial data platform (~24,000 stocks). This historical information was retrieved via the  \href{https://developer.yahoo.com/yql}{Yahoo data platform}.
+	\item \textbf{Stocks}
+		- This dataset is a listing of all stocks currently available on the Yahoo financial data platform and also the categories and indexes they are associated with.  This index also contains the current aliases for each stock as well.
+	\item \textbf{News Articles}
+		- The dataset is a collection of news articles that have been retrieved from various website via web page scraping.  Currently this dataset is made up of content from:
+		\begin{itemize}
+			\item \href{http://www.newsmax.com/archives/}{newsmax.com}
+		\end{itemize}
+	\item \textbf{Stock Articles}
+		- The dataset is a joined collection of the above three data sets.  This will be used as our training and testing data for our model. Each document in the dataset, D will consist of:
+		\begin{description}
+			\item[title] : The title of an article
+			\item[content] : The contents of a scraped article
+			\item[date] : The date that an article was published
+			\item[symbol] : The symbol of the stock with the highest correlation to the article
+			\item[stockHistoryDate] : The day after the article was released.  This will be the date for which we will retrieve stock history.
+			\item[close] : The closing price of a given stock for the specified date
+			\item[open] : The opening price of a given stock for the specified date
+		\end{description}
+  \end{itemize}
+
+\section{The Models}
+\label{sec:models}
+
+\subsection{Baseline Models}
+\label{sec:baseline-models}
+\instructions{In order to know how difficult the task is and how well we are doing, we need to know how well a suitable baseline model would perform. Define a baseline model for your task. This may not necessarily be a learned model.}
+
+\subsection{Existing Models}
+\label{sec:existing-models}
+\instructions{If people have worked on this task before, summarize (and cite) some of the existing models} 
+
+\subsection{Proposed Model(s)}
+\label{sec:proposed-models}
+\instructions{Your models and your procedure for learning them go here. Describe both in detail, even if the learning procedure is standard.}
+
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Hypotheses}
+\label{sec:exper-hypoth}
+\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
+
+\subsection{Experimental setup}
+\label{sec:experimental-setup}
+\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
+List the models you will evaluate. Cite any existing tools or software you use to perform your experiments; describe what you implemented yourself. Describe how you obtained the features used by each of the models.}
+
+\subsection{Experimental results}
+\label{sec:experimental-results}
+\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
+
+\section{Conclusion}
+\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
+
+%\section*{\instructions{Bibliography}}
+%\instructions{Don't forget to create your own .bib file. If you call it {\tt mybib.bib} and put it in the same directory as this {\tt .tex} file, add {\tt$\backslash$bibliography\{mybib\}} before {\tt$\backslash$end\{document\}}
+%}
+
+\section*{Bibliography}
+\bibliography{CS446proj}{}
+\bibliographystyle{plain}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

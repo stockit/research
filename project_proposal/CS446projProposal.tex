@@ -90,7 +90,14 @@ for the pdf)
   stock prices on test data.
 
 \section*{Our approach}
-  We will separate our news articles into test and training sets. For the training news
+To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm (\href{http://tartarus.org/~martin/PorterStemmer/}{http://tartarus.org/~martin/PorterStemmer/}) to improve search results. \\ \\  
+Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using cosine similarity \\ \\ 
+  \[ 
+  	score(q,d) = cosine\_similarity(q,d) = \frac{ V(q) \cdot V(d) }{ | V(q) | | V(d) | } 
+\]
+where \(V\) is a mapping function that translates both the query and document to a search vector \\ \\
+ To find the most relevant ticker we will find the ticker for each article that has the highest correlated score.  This will give us a new composite dataset which we will use as our training and test data for our algorithm. \\ \\
+  We will separate our joined news articles into test and training sets. For the training news
   articles, we will find the $n$ companies referred to in the article by taking a given
   list of companies and checking it is "matched" in the article. For example, we will
   take company names and their aliases and check for text similarity score for a given

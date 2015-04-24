@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+
+\bibitem{porter}
+S.E.~Robertson C.J.~van Rijsbergen and M.F. Porter.
+\newblock {\em New models in probabilistic information retrieval}.
+\newblock British Library, London, 1980.
+
+\bibitem{similarity}
+The Apache Apache~Software Foundation.
+\newblock {Lucene} similarity.
+
+\bibitem{arizona}
+Robert~P. Schumaker and Hsinchun Chen.
+\newblock Textual analysis of stock market prediction using financial news
+  articles.
+\newblock {\em Artificial Intelligence Lab, Department of Management
+  Information Systems}, 2009.
+
+\end{thebibliography}
