@@ -8,6 +8,9 @@ S.E.~Robertson C.J.~van Rijsbergen and M.F. Porter.
 \bibitem{similarity}
 The Apache Apache~Software Foundation.
 \newblock {Lucene} similarity.
+\newblock
+  \url{https://lucene.apache.org/core/2_9_4/api/core/org/apache/lucene/search/Similarity.html}.
+\newblock Accessed: 2015-04-16.
 
 \bibitem{arizona}
 Robert~P. Schumaker and Hsinchun Chen.
