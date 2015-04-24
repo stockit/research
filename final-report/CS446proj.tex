@@ -29,7 +29,7 @@
 We would like to given a set of articles create a similarity matrix between each document and then create a simple kNN clustering algorithm to predict the trend of a given stock.
 \end{abstract}
 
-\section{Introduction} 
+\section{Introduction}
 \label{sec:introduction}
 %\instructions{This should be a brief outline of the paper -- use plain English, no math. Note that you should be able to write most of this section before you actually perform any experiments. First, define and motivate your task: what are you trying to learn, and why is this an important task? Second, define what kind of a machine learning problem this requires you to solve (binary/multiclass classification, ranking, ....). What is an appropriate baseline model for this task? What kind of model are you proposing? 
 %Briefly summarize the assumptions your model makes. Finally, describe the hypotheses you wish to test. These are typically statements of the form ``we expect model/features A to perform better on this task than model/features B''.
@@ -41,7 +41,7 @@ Our null hypothesis is that we would like to prove that calculating stock trends
 \label{sec:background}
 %\instructions{Summarize and discuss related work that you are building on: this requires you to find, read and cite a few research papers. This is also something you can get started on as soon as you have settled on a task.} 
   There have been other attempts to predict stock market prices using machine learning. For example, \href{http://ailab.arizona.edu/intranet/papers/Textual\%20Analysis\%20of\%20Stock\%20Market.pdf}{Textual Analysis of Stock Market Prediction Using Financial News Articles} approaches this challenge from a very similar direction. Their research has shown that text information can provide a 1\% to 2\% increase in accuracy of predicting the change in a stock price than a purely regressive model ~\cite{arizona}
- 
+
 \section{Task and Data}
 \label{sec:taskAndData}
 \instructions{Now describe the task and data in more detail.}
@@ -64,6 +64,15 @@ where
 	\[
 		coord(q,d_j) = \frac{\text{\# of query terms found in } d_j }{\text{\# of query terms}}
 	\]
+\end{description}
+
+\begin{description}
+	\item[KNN] : We implement KNN using the text similarity of the document to find its nearest neighbors. We use the
+	percentage change of the stock referenced in each neighbor to calculate a mean percentage change. This mean
+	percentage change is used as the prediction.
+	\item[Constraints] : We make sure to only use neighbors which are included in the test data. Accordingly, the percentage
+	change of the stock referenced in the document is calculated using the open/close price for the day after the
+	article was published. ~\cite{stock-matrix}
 \end{description}
 
 
@@ -106,11 +115,21 @@ where \(V\) is a mapping function that translates both the query and document to
 
 \subsection{Baseline Models}
 \label{sec:baseline-models}
-\instructions{In order to know how difficult the task is and how well we are doing, we need to know how well a suitable baseline model would perform. Define a baseline model for your task. This may not necessarily be a learned model.}
+%\instructions{In order to know how difficult the task is and how well we are doing, we need to know how well a suitable baseline model would perform. Define a baseline model for your task. This may not necessarily be a learned model.}
+The baseline model we will choose to measure against stockit is a simple random guess.
+50\% choose a positive price movement otherwise a negative price movement. This problem is a bit unique
+where simply classifying with high accuracy does not guarantee good real world accuracy. It is important that the \\ \\
+$\sum_{d}^{CorrectlyClassified(D)} percentageChange(d) > \sum_{d}^{MissedClassified(D)} percentageChange(d)$ \\ \\
+Note that our model does not take this into effect.
 
 \subsection{Existing Models}
 \label{sec:existing-models}
-\instructions{If people have worked on this task before, summarize (and cite) some of the existing models} 
+%\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
+One of the baseline models is the linear regression model. The predicted for a stock is given by \\ \\
+prediction(S, i) = $\sum_{i=i}^{n} percentageChange(S, day(i)) / n$ \\ \\
+This model provide a significant increase in accuracy compared to random chance.
+One paper created a model by using text mining with sparse matrix factorization. ~\cite{stock-matrix}
+The sparse matrix factorization model produced a significant increase in accuracy roughly 53.9\% ~ 55.7\%.
 
 \subsection{Proposed Model(s)}
 \label{sec:proposed-models}
