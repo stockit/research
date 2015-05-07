@@ -8,6 +8,7 @@
 \usepackage{mathptmx}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{relsize}
 \usepackage{natbib} % for references
 \usepackage[usenames,dvipsnames]{xcolor}
 \newcommand{\blue}[1]{\textcolor{RoyalBlue}{#1}}
@@ -16,7 +17,7 @@
 
 \begin{document}
 
-\title{CS446 Class Project Proposal - Stockit}
+\title{CS446 Class Project - Stockit}
 \author{dmcquil2@illinois.edu, mcconne7@illinois.edu}
 \maketitle
 
@@ -44,7 +45,7 @@ Our null hypothesis is that we would like to prove that calculating stock trends
 
 \section{Task and Data}
 \label{sec:taskAndData}
-\instructions{Now describe the task and data in more detail.}
+%\instructions{Now describe the task and data in more detail.}
 
 \subsection{The Task}
 \label{sec:task}
@@ -81,9 +82,9 @@ where
 %\instructions{Describe the data you use to train and evaluate your models. Describe where you got it from (include references/citations to published works, or URLs!). Describe and give examples for the features that you have access to.} 
   For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
 To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\  
-Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using cosine similarity \\ \\ 
+Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using the similarity function above. \\ \\ 
   \[
-  	score(q,d) = cosine\_similarity(q,d) = \frac{ V(q) \cdot V(d) }{ | V(q) | | V(d) | } 
+  	score(q,d) = sim(q, d)
 \]
 where \(V\) is a mapping function that translates both the query and document to a search vector \\ \\
  To find the most relevant ticker we will find the ticker for each article that has the highest correlated score.  This will give us a new composite dataset which we will use as our training and test data for our algorithm.
@@ -134,6 +135,22 @@ The sparse matrix factorization model produced a significant increase in accurac
 \subsection{Proposed Model(s)}
 \label{sec:proposed-models}
 %\instructions{Your models and your procedure for learning them go here. Describe both in detail, even if the learning procedure is standard.}
+Our model will be generated using a k-nearest neighbor clustering algorithm.  Using our data set D, we will take the k closest documents to the queried document, \(d\). Once we retrieve the nearest documents we will then calculate the predicted percentage change.
+\[
+	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ dist(d,d_i) }{\sum^k_{j=1} dist(d, d_j)}
+\]
+\[
+	\text{perecentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i) 
+\]
+where
+\begin{description}
+	\item[\(P(C | d_i)\)] : The probability of a given document, \( i \) to contribute to the score resultant change of the document queried for.
+	\item[\textbf{\(dist(d,d_i)\)}] : \( \forall d, d_i, d_j \in D \) the distance between any two documents is described as
+	\[
+		dist(d, d') = score(d, d') \text{ where d represents the contents of an article } 
+	\]
+	\item[\(percentageChange(d)\)] : the estimated percentage change that an article will cause
+\end{description}
 
 \section{Experiments}
 \label{sec:experiments}
