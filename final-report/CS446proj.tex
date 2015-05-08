@@ -140,7 +140,7 @@ Our model will be generated using a k-nearest neighbor clustering algorithm.  Us
 	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ dist(d,d_i) }{\sum^k_{j=1} dist(d, d_j)}
 \]
 \[
-	\text{perecentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i)
+	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i) 
 \]
 where
 \begin{description}
@@ -185,6 +185,35 @@ where
   was then randomly shuffled and place into 5 folds. We used the training documents as the
   instances for KNN.
 \end{itemize}
+
+\subsubsection{Data splits}
+
+\subsubsection{Evaluation}
+
+\subsubsection{Tools/Software}
+For the purpose of this project we implemented a solr client to interface with our solr server.  We then created a set of utilities to perform estimations for the percentage change of a document given it's neighbors.  Two implementations of our predictor were created for the purpose of this project:
+\begin{description}
+	\item[Predictor]
+	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
+	 \item[WeightedPredictor]
+	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document distances.  
+	 \[
+		 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ dist(d,d_i) }{\sum^k_{j=1} dist(d, d_j)} \text{ where k is the number of neighbors }
+	\]
+	 Given this distribution it will then calculate the expected percentage change by creating a sum of the percentage change weighted by it's probability of it influencing a change, \(P(C | d_i)\).
+\end{description}
+We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
+
+\subsubsection{Feature Retrieveal}
+Given either prediction implementation we needed to obtain values to for the percentage change of a stock price given a document and also the similarity score of a given document to another document.  The similarity score is defined as a function of the term and document frequencies for a given query and a document.
+\[
+	 dist(d, d_j) = sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
+\]
+The percentage change is simply described as the difference between the open and close of the stock price for the correlated document.
+\[
+	\text{percentageChange}(d) = \frac{ \text{open} - \text{close} }{\text{open}}
+\]
+
 
 \subsection{Experimental results}
 \label{sec:experimental-results}
