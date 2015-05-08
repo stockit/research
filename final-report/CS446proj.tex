@@ -99,13 +99,12 @@ where
 \end{description}
 
 \begin{description}
-	\item[KNN] : We implement KNN using the text similarity of the document to find its nearest neighbors. We use the
-	percentage change of the stock referenced in each neighbor to calculate a mean percentage change. This mean
-	percentage change is used as the prediction.
-	\item[Constraints] :
+	\item[KNN] : We implement KNN using the text similarity of the document to
+    find its nearest neighbors and record the percentage changes of the stock referenced.
+  \item[Constraints] :
     \begin{itemize}
       \item We make sure to only use neighbors which are included in the training data.
-      \item price movement of the stock referenced in the document is calculated
+      \item We make sure the price movement of the stock referenced in the document is calculated
             using the next day's open/close price from the document
             published date. ~\cite{stock-matrix}
     \end{itemize}
@@ -127,7 +126,7 @@ stemming ~\cite{porter} to improve search results. \\ \\
 Using our three datasets we will create a fourth composite dataset that will
 be a document set that contains an article, the most relevant ticker, and
 the history for the day following the release of the article. We use a
-set of synonyms generated from our stock stockers from
+set of synonyms generated from our stock aliases set.
 For a given query and a document we calculate the score using the
 similarity function above. \\ \\
 \begin{equation}\label{doc:score}
@@ -193,7 +192,7 @@ Note that our model does not take this into effect.
 \subsection{Existing Models}
 \label{sec:existing-models}
 %\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
-One of the baseline models is the linear regression model. The predicted for a stock is given by
+One of the baseline models is the linear regression model. The prediction for a stock is given by
 \begin{equation}\label{pred:uniform}
 	\text{prediction}(s, i) \mathlarger{ \mathlarger{ \sum } }_{i=i}^{n} \frac{\text{percentageChange}(s, \text{day}_i) }{ n }
 \end{equation}
@@ -202,19 +201,22 @@ where \begin{description}
 	\item[\textbf{\(\text{day}_i\)}] : A historic day for a given stock \(S\)
 	\item[\textbf{n}] : The total number of days
 \end{description}
-This model provide a significant increase in accuracy compared to random chance.
 One paper created a model by using text mining with sparse matrix factorization.~\cite{stock-matrix}
 The sparse matrix factorization model produced a significant increase in accuracy roughly 53.9\% to 55.7\%.
 
 \subsection{Proposed Model(s)}
 \label{sec:proposed-models}
 %\instructions{Your models and your procedure for learning them go here. Describe both in detail, even if the learning procedure is standard.}
-Our model will be generated using a k-nearest neighbor clustering algorithm.  Using our data set D, we will take the k closest documents to the queried document, \(d\). The closest neighboring documents will be fetched by maximizing the text similarity between documents.  Once we retrieve the nearest neighbors to a given document we will then calculate the predicted percentage change.
+Our model will be generated using a k-nearest neighbor clustering algorithm.
+Using our data set D, we will take the k closest documents to the
+queried document, \(d\). The closest neighboring documents will be fetched by
+maximizing the text similarity between documents. Once we retrieve the
+nearest neighbors to a given document we will then calculate the predicted percentage change.
 \begin{equation}\label{doc:prob}
 	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ sim(d,d_i) }{\sum^k_{j=1} sim(d, d_j)}
 \end{equation}
 \begin{equation}\label{doc:pDelta}
-	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i) 
+	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i)
 \end{equation}
 where
 \begin{description}
@@ -226,8 +228,10 @@ where
 \section{Experiments}
 %\label{sec:experiments}
 \begin{itemize}
-  \item Experiment 1: This our baseline experiment, the proposed model is
-  implemented and results are calculated.
+  \item Experiment 1: In this experiment, the proposed model is
+  baseline kNN with arithemtic mean.
+  \item Experiment 2: In this experiment, the proposed model is
+  kNN using a probability model to calculate the expectation.
 \end{itemize}
 
 \subsection{Experimental Hypotheses}
@@ -238,6 +242,10 @@ where
   correlate with the next day's stock price of the stock they mention.
   Specifically, our model proposes that similar news article documents to a new
   document will show the same or correlated stock price movement as that of the new document.
+  \item Experiment 2: Our model making the assumption that news documents
+  correlate with the next day's stock price of the stock they mention.
+  Specifically, this model proposes that the document similarity score can be
+  used to calculate a more accurate prediction.
 \end{itemize}
 
 \subsection{Experimental setup}
@@ -252,19 +260,20 @@ where
 \end{description}
 
 \begin{itemize}
-  \item Experiment 1: This experiment split the documents into half training and half testing
-  chronologically (ordered by the publish date of the article). The test group
-  was then randomly shuffled and place into 5 folds. We used the training documents as the
-  instances for KNN.
-  \item Experiment 2: Given the results of the first experiment. We wanted to see
-  how the model would behave over time. This experiment split the documents into
-  four chronological segments testing chronologically (ordered by the publish
-  date of the article). Each segment was then split into half training and half testing
-  Again, the test group was then randomly shuffled and place into 5 folds.
+  \item Experiment 1: In order to include the models behavior over time.
+  This experiment split the documents into four chronological
+  segments (ordered by the publish date of the article).
+  Each segment was then split into half training and half testing
+  Each test segment was randomly shuffled and place into 5 folds (each fold
+  using the same training data).
 \end{itemize}
 
 \subsubsection{Tools/Software}
-For the purpose of this project we implemented a solr client to interface with our solr server.  We then created a set of utilities to perform estimations for the percentage change of a document given it's neighbors.  Two implementations of our predictor were created for the purpose of this project:
+For the purpose of this project we implemented a solr client to
+interface with our solr server. We then created a set of utilities to
+perform estimations for the percentage change of a document given it's
+neighbors.  Two implementations of our predictor were created for the
+purpose of this project:
 \begin{description}
 	\item[Predictor]
 	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
@@ -275,8 +284,12 @@ For the purpose of this project we implemented a solr client to interface with o
 We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
 
 \subsubsection{Feature Retrieveal}
-Given either prediction implementation we needed to obtain values to for the percentage change of a stock price given a document and also the similarity score of a given document to another document.  The similarity score is defined above in equation \eqref{doc:sim}. \\
-The percentage change is simply described as the difference between the open and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
+Given either prediction implementation we needed to obtain values to for the
+percentage change of a stock price given a document and also the similarity
+score of a given document to another document. The similarity score
+is defined above in equation \eqref{doc:sim}. \\
+The percentage change is simply described as the difference between the open
+and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
 
 \subsection{Experimental results}
 \label{sec:experimental-results}
@@ -291,7 +304,7 @@ The percentage change is simply described as the difference between the open and
 %\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
 \begin{itemize}
 \item Experiment 1: We found that daily stock movements do not have a
-  baseline probability of 
+  baseline probability of
 \[
   	P(\text{positive} | \text{Dataset}) \approx 50\%
 \]
