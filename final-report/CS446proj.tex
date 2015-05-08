@@ -36,21 +36,23 @@ from the content of a news article.
 %\instructions{This should be a brief outline of the paper -- use plain English, no math. Note that you should be able to write most of this section before you actually perform any experiments. First, define and motivate your task: what are you trying to learn, and why is this an important task? Second, define what kind of a machine learning problem this requires you to solve (binary/multiclass classification, ranking, ....). What is an appropriate baseline model for this task? What kind of model are you proposing? 
 %Briefly summarize the assumptions your model makes. Finally, describe the hypotheses you wish to test. These are typically statements of the form ``we expect model/features A to perform better on this task than model/features B''.
 %Outline how your experiments will evaluate these hypotheses (comparisons of different models, ablation studies, learning curves, oracle experiments... ). }
-We created an algorithm that forecasts stock price changes from news article content and historic stock prices.
+We created an algorithm that forecasts a stock price movement from news
+article content and historic stock prices.
 We pursued this algorithm because it's prediction could act as a hint as to
 whether a stock is about to increase or decrease in price. We used a
 text search algorithm to rank the tickers on document relevance. Then we created
 a kNN implementation to cluster the documents according to a positive or
 negative increase in the mentioned stock. \\  \\
-We propose a model that will predict the stock change as a percentage by
-applying a probabilistic model to the neighbors of a given document that
-will be used to weight each percentage to finally calculate the
-aggregate percentage. Two variations of this model will be tested:
+We propose a model that will predict the stock price movement as the expectation
+of probabilistic model.
+Two variations of this model will be tested:
 \begin{itemize}
-	\item A probabilistic model with a uniform distribution
-		This will require a base feature set of the percentage change for each document.
-	\item A probabilistic model with a calculated distribution using the similarity similarity between documents as a probability measure.
-		This will require both the base feature set of the percentage change of a document as well as the similarity score between the queried document and the sorted retrieved documents.
+	\item A model with using the arithmetic mean of its kNN neighbors. This will
+    require a base feature set of the percentage change for each document.
+	\item A probabilistic model with a calculated distribution using the similarity
+    between documents as a probability measure. This will require both the
+    base feature set of the percentage change of a document as well
+    as the similarity score between the queried document and the sorted retrieved documents.
 \end{itemize}
 We expect the model with the calculated probability to perform better than
 the model that is uniformly distributed. Our hypotheses will be evaluated
