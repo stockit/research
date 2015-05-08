@@ -80,7 +80,7 @@ where
 \subsection{The Data}
 \label{sec:data}
 %\instructions{Describe the data you use to train and evaluate your models. Describe where you got it from (include references/citations to published works, or URLs!). Describe and give examples for the features that you have access to.} 
-  For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
+For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
 To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\  
 Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using the similarity function above. \\ \\ 
   \[
@@ -172,16 +172,29 @@ where
 \subsection{Experimental setup}
 \label{sec:experimental-setup}
 %\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
+\begin{description}
+  \item[\(Accuracy(Model, Dataset)\)] : $|CorrectPredictions(Model, Dataset)| / |Dataset|$
+  \item[\(P(Movement = positive | Dataset)\)] : $[\sum_{d \in Dataset} Sign(d)] / |Dataset|$
+  \item[\(TotalAggCap(Model, Dataset)\)] : $\sum_{d \in Dataset} AggressiveCapture(Model, d) $
+  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * Sign(d) * \ln(\epsilon + |Prediction|)$
+\end{description}
+
 \begin{itemize}
   \item Experiment 1: This one split the documents into half training and half testing
   chronologically (ordered by the publish date of the article). The test group
-  was then randomly shuffled and place into 5 folds. We used the training set as the
+  was then randomly shuffled and place into 5 folds. We used the training documents as the
   instances for KNN.
 \end{itemize}
 
 \subsection{Experimental results}
 \label{sec:experimental-results}
-\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
+%\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
+\begin{itemize}
+  \item Experiment 1: This one split the documents into half training and half testing
+  chronologically (ordered by the publish date of the article). The test group
+  was then randomly shuffled and place into 5 folds. We used the training documents as the
+  instances for KNN.
+\end{itemize}
 
 \section{Conclusion}
 \instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
