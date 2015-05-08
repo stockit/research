@@ -42,15 +42,16 @@ We pursued this algorithm because it's prediction could act as a hint as to
 whether a stock is about to increase or decrease in price. We used a
 text search algorithm to rank the tickers on document relevance. Then we created
 a kNN implementation to cluster the documents according to a positive or
-negative increase in the mentioned stock. \\  \\
-We propose a model that will predict the stock price movement as the expectation
-of probabilistic model.
+negative price movement in the mentioned stock. \\  \\
+We propose a model that will predict the stock price movement focused around
+document similarity and clustering.
 Two variations of this model will be tested:
 \begin{itemize}
 	\item A model with using the arithmetic mean of its kNN neighbors. This will
     require a base feature set of the percentage change for each document.
-	\item A probabilistic model with a calculated distribution using the similarity
-    between documents as a probability measure. This will require both the
+	\item A probabilistic model using the similarity between documents as a
+    probability measure. It will use this probability to calculate the expectation of
+    the stock price movement. This will require both the
     base feature set of the percentage change of a document as well
     as the similarity score between the queried document and the sorted retrieved documents.
 \end{itemize}
@@ -80,7 +81,7 @@ In order to predict stock trends we will be using a k nearest neighbor
 algorithm that will cluster the documents. This algorithm will
 first generate a similarity score for all documents.
 The similarity between documents will be calculated using the
-following scoring function. ~\cite{similarity}
+following similarity function. ~\cite{similarity}
 \begin{equation}\label{doc:sim}
 	sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
 \end{equation}
