@@ -176,19 +176,22 @@ where
   \item[\(Accuracy(Model, Dataset)\)] : $|CorrectPredictions(Model, Dataset)| / |Dataset|$
   \item[\(P(Movement = positive | Dataset)\)] : $[\sum_{d \in Dataset} Sign(d)] / |Dataset|$
   \item[\(TotalAggCap(Model, Dataset)\)] : $\sum_{d \in Dataset} AggressiveCapture(Model, d) $
-  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * Sign(d) * \ln(\epsilon + |Prediction|)$
+  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * d * \ln(\epsilon + |Prediction|)$
+  \item[\(NetCapture(Prediction, d)\)] : $Sign(Prediction) * d)$
 \end{description}
 
 \begin{itemize}
-  \item Experiment 1: This one split the documents into half training and half testing
+  \item Experiment 1: This experiment split the documents into half training and half testing
   chronologically (ordered by the publish date of the article). The test group
   was then randomly shuffled and place into 5 folds. We used the training documents as the
   instances for KNN.
+  \item Experiment 2: Given the results of the first experiment. We wanted to see
+  how the model would behave over time. This experiment split the documents into
+  four chronological segments testing chronologically (ordered by the publish
+  date of the article). Each segment was then split into half training and half testing
+  Again, the test group was then randomly shuffled and place into 5
+  folds.
 \end{itemize}
-
-\subsubsection{Data splits}
-
-\subsubsection{Evaluation}
 
 \subsubsection{Tools/Software}
 For the purpose of this project we implemented a solr client to interface with our solr server.  We then created a set of utilities to perform estimations for the percentage change of a document given it's neighbors.  Two implementations of our predictor were created for the purpose of this project:
@@ -196,7 +199,7 @@ For the purpose of this project we implemented a solr client to interface with o
 	\item[Predictor]
 	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
 	 \item[WeightedPredictor]
-	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document distances.  
+	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document distances.
 	 \[
 		 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ dist(d,d_i) }{\sum^k_{j=1} dist(d, d_j)} \text{ where k is the number of neighbors }
 	\]
@@ -219,14 +222,23 @@ The percentage change is simply described as the difference between the open and
 \label{sec:experimental-results}
 %\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
 \begin{itemize}
-  \item Experiment 1: This one split the documents into half training and half testing
-  chronologically (ordered by the publish date of the article). The test group
-  was then randomly shuffled and place into 5 folds. We used the training documents as the
-  instances for KNN.
+\item Experiment 1: We received a mean accuracy of 45.63\% across the five folds.
+  The mean net capture was 0.1411. The mean aggressive capture was 0.2334.
+\item Experiment 2: TO DO
 \end{itemize}
 
 \section{Conclusion}
-\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
+%\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
+\begin{itemize}
+\item Experiment 1: We found that daily stock movements do not have a
+  baseline probability of $P(positive | Dataset) ~ 50\% or P(negative | Dataset) ~ 50\%$.
+  Instead there is a bias toward positive or negative depending on date of sample/distribution.
+  Accordingly, it is not enough to know with high likelihood the direction a
+  stock is going to move on a given day to produce a profitable model. There
+  was little correlation with folds with high accuracy (~65\%) and the
+  net aggressive capture.
+\item Experiment 2:
+\end{itemize}
 
 %\section*{\instructions{Bibliography}}
 %\instructions{Don't forget to create your own .bib file. If you call it {\tt mybib.bib} and put it in the same directory as this {\tt .tex} file, add {\tt$\backslash$bibliography\{mybib\}} before {\tt$\backslash$end\{document\}}
