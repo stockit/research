@@ -36,21 +36,24 @@ from the content of a news article.
 %\instructions{This should be a brief outline of the paper -- use plain English, no math. Note that you should be able to write most of this section before you actually perform any experiments. First, define and motivate your task: what are you trying to learn, and why is this an important task? Second, define what kind of a machine learning problem this requires you to solve (binary/multiclass classification, ranking, ....). What is an appropriate baseline model for this task? What kind of model are you proposing? 
 %Briefly summarize the assumptions your model makes. Finally, describe the hypotheses you wish to test. These are typically statements of the form ``we expect model/features A to perform better on this task than model/features B''.
 %Outline how your experiments will evaluate these hypotheses (comparisons of different models, ablation studies, learning curves, oracle experiments... ). }
-We created an algorithm that forecasts stock price changes from news article content and historic stock prices.
-We pursued this algorithm because it's prediction could act as a hint as to
+We created an algorithm that forecasts a stock price movement from news
+article content and historic stock prices.
+We pursued this algorithm because it's prediction could act as an indicator to
 whether a stock is about to increase or decrease in price. We used a
 text search algorithm to rank the tickers on document relevance. Then we created
 a kNN implementation to cluster the documents according to a positive or
-negative increase in the mentioned stock. \\  \\
-We propose a model that will predict the stock change as a percentage by
-applying a probabilistic model to the neighbors of a given document that
-will be used to weight each percentage to finally calculate the
-aggregate percentage. Two variations of this model will be tested:
+negative price movement in the mentioned stock. \\  \\
+We propose a model that will predict the stock price movement focused around
+document similarity and clustering.
+Two variations of this model will be tested:
 \begin{itemize}
-	\item A probabilistic model with a uniform distribution
-		This will require a base feature set of the percentage change for each document.
-	\item A probabilistic model with a calculated distribution using the similarity similarity between documents as a probability measure.
-		This will require both the base feature set of the percentage change of a document as well as the similarity score between the queried document and the sorted retrieved documents.
+	\item A model with using the arithmetic mean of its kNN neighbors. This will
+    require a base feature set of the percentage change for each document.
+	\item A probabilistic model uses the similarity between documents as a
+    probability measure. It will use this probability to calculate the expectation of
+    the stock price movement. This will require both the
+    base feature set of the percentage change of a document as well
+    as the similarity score between the queried document and the sorted retrieved documents.
 \end{itemize}
 We expect the model with the calculated probability to perform better than
 the model that is uniformly distributed. Our hypotheses will be evaluated
@@ -78,7 +81,7 @@ In order to predict stock trends we will be using a k nearest neighbor
 algorithm that will cluster the documents. This algorithm will
 first generate a similarity score for all documents.
 The similarity between documents will be calculated using the
-following scoring function. ~\cite{similarity}
+following similarity function. ~\cite{similarity}
 \begin{equation}\label{doc:sim}
 	sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
 \end{equation}
@@ -96,13 +99,12 @@ where
 \end{description}
 
 \begin{description}
-	\item[KNN] : We implement KNN using the text similarity of the document to find its nearest neighbors. We use the
-	percentage change of the stock referenced in each neighbor to calculate a mean percentage change. This mean
-	percentage change is used as the prediction.
-	\item[Constraints] :
+	\item[KNN] : We implement KNN using the text similarity of the document to
+    find its nearest neighbors and record the percentage changes of the stock referenced.
+  \item[Constraints] :
     \begin{itemize}
       \item We make sure to only use neighbors which are included in the training data.
-      \item price movement of the stock referenced in the document is calculated
+      \item We make sure the price movement of the stock referenced in the document is calculated
             using the next day's open/close price from the document
             published date. ~\cite{stock-matrix}
     \end{itemize}
@@ -124,7 +126,7 @@ stemming ~\cite{porter} to improve search results. \\ \\
 Using our three datasets we will create a fourth composite dataset that will
 be a document set that contains an article, the most relevant ticker, and
 the history for the day following the release of the article. We use a
-set of synonyms generated from our stock stockers from
+set of synonyms generated from our stock aliases set.
 For a given query and a document we calculate the score using the
 similarity function above. \\ \\
 \begin{equation}\label{doc:score}
@@ -190,7 +192,7 @@ Note that our model does not take this into effect.
 \subsection{Existing Models}
 \label{sec:existing-models}
 %\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
-One of the baseline models is the linear regression model. The predicted for a stock is given by
+One of the baseline models is the linear regression model. The prediction for a stock is given by
 \begin{equation}\label{pred:uniform}
 	\text{prediction}(s, i) \mathlarger{ \mathlarger{ \sum } }_{i=i}^{n} \frac{\text{percentageChange}(s, \text{day}_i) }{ n }
 \end{equation}
@@ -199,19 +201,27 @@ where \begin{description}
 	\item[\textbf{\(\text{day}_i\)}] : A historic day for a given stock \(S\)
 	\item[\textbf{n}] : The total number of days
 \end{description}
-This model provide a significant increase in accuracy compared to random chance.
 One paper created a model by using text mining with sparse matrix factorization.~\cite{stock-matrix}
 The sparse matrix factorization model produced a significant increase in accuracy roughly 53.9\% to 55.7\%.
 
 \subsection{Proposed Model(s)}
 \label{sec:proposed-models}
 %\instructions{Your models and your procedure for learning them go here. Describe both in detail, even if the learning procedure is standard.}
-Our model will be generated using a k-nearest neighbor clustering algorithm.  Using our data set D, we will take the k closest documents to the queried document, \(d\). The closest neighboring documents will be fetched by maximizing the text similarity between documents.  Once we retrieve the nearest neighbors to a given document we will then calculate the predicted percentage change.
+Our model will be generated using a k-nearest neighbor clustering algorithm.
+Using our data set D, we will take the k closest documents to the
+queried document, \(d\). The closest neighboring documents will be fetched by
+maximizing the text similarity between documents. Once we retrieve the
+nearest neighbors to a given document we will then calculate the predicted percentage change.
+\begin{equation}\label{doc:pDelta}
+	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i)
+\end{equation}
+For the baseline model:
+\begin{equation}\label{doc:prob}
+	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ 1 }{ k }
+\end{equation}
+For the probabilistic model:
 \begin{equation}\label{doc:prob}
 	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ sim(d,d_i) }{\sum^k_{j=1} sim(d, d_j)}
-\end{equation}
-\begin{equation}\label{doc:pDelta}
-	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i) 
 \end{equation}
 where
 \begin{description}
@@ -223,57 +233,77 @@ where
 \section{Experiments}
 %\label{sec:experiments}
 \begin{itemize}
-  \item Experiment 1: This our baseline experiment, the proposed model is
-  implemented and results are calculated.
+  \item Experiment 1: In this experiment, the proposed model is
+  baseline kNN with arithemtic mean.
+  \item Experiment 2: In this experiment, the proposed model is
+  kNN using a probability model to calculate the expectation.
 \end{itemize}
 
 \subsection{Experimental Hypotheses}
 \label{sec:exper-hypoth}
 %\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
 \begin{itemize}
-  \item Experiment 1: Our model making the assumption that news documents
+  \item Experiment 1: Our model makes the assumption that news documents
   correlate with the next day's stock price of the stock they mention.
   Specifically, our model proposes that similar news article documents to a new
   document will show the same or correlated stock price movement as that of the new document.
+  \item Experiment 2: Specifically, this model proposes that the
+  document similarity score can be used to form a probabilistic model to compute
+  a more accurate prediction.
 \end{itemize}
 
 \subsection{Experimental setup}
 \label{sec:experimental-setup}
 %\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
 \begin{description}
-  \item[\(Accuracy(Model, Dataset)\)] : \(|CorrectPredictions(Model, Dataset)| / |Dataset|\)
-  \item[\(P(Movement = positive | Dataset)\)] : \([\sum_{d \in Dataset} Sign(d)] / |Dataset|\)
-  \item[\(TotalAggCap(Model, Dataset)\)] : \(\sum_{d \in Dataset} AggressiveCapture(Model, d) \)
-  \item[\(AggressiveCapture(Prediction, d)\)] : \(Sign(Prediction) * d * \ln(e + |Prediction|) \)
-  \item[\(NetCapture(Prediction, d)\)] : \(Sign(Prediction) * d)\)
+  \item[\(accuracy(model, D)\)] : \(|D^+| / |D|\)
+  \item[\(P(d_i = positive | D)\)] : \([\sum_{d_i \in D} sign(d_i)] / |D|\)
+  \item[\(totalAggCap(model, dataset)\)] : \(\sum_{d_i \in D} aggressiveCapture(model, d_i) \)
+  \item[\(aggressiveCapture(prediction, d_i)\)] : \(sign(prediction) * d_i * \ln(e + |prediction|) \)
+  \item[\(netCapture(prediction, d_I)\)] : \(sign(prediction) * d)\)
 \end{description}
 
 \begin{itemize}
-  \item Experiment 1: This experiment split the documents into half training and half testing
-  chronologically (ordered by the publish date of the article). The test group
-  was then randomly shuffled and place into 5 folds. We used the training documents as the
-  instances for KNN.
-  \item Experiment 2: Given the results of the first experiment. We wanted to see
-  how the model would behave over time. This experiment split the documents into
-  four chronological segments testing chronologically (ordered by the publish
-  date of the article). Each segment was then split into half training and half testing
-  Again, the test group was then randomly shuffled and place into 5 folds.
+  \item Experiment 1: In order to include the models behavior over time.
+  This experiment split the documents into four chronological
+  segments (ordered by the publish date of the article).
+  Each segment was then split into half training and half testing
+  Each test segment was randomly shuffled and place into 5 folds (each fold
+  using the same training data).
 \end{itemize}
 
 \subsubsection{Tools/Software}
-For the purpose of this project we implemented a solr client to interface with our solr server.  We then created a set of utilities to perform estimations for the percentage change of a document given it's neighbors.  Two implementations of our predictor were created for the purpose of this project:
+For the purpose of this project we implemented a solr client to
+interface with our solr server. We then created a set of utilities to
+perform estimations for the percentage change of a document given it's
+neighbors. Two implementations of our predictor were created for the
+purpose of this project:
 \begin{description}
 	\item[Predictor]
-	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
-	 \item[WeightedPredictor]
-	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document similarities from equation \eqref{doc:prob}
-	 Given this distribution it will then calculate the expected percentage change by creating a sum of the percentage change weighted by it's probability of it influencing a change, \(P(C | d_i)\).
+	 This implementation predicts the percentage change of a stock given an
+   article by calculating the percentage change using the arithmetic mean.
+   Thus, for this we are simply calculating an expected value assuming a
+   uniform distribution. Equivalently, the mean of all the neighbors' percentage changes.
+	 \item[ExpectationPredictor]
+	 This implementation estimates the expected value of the percentage change
+   for a given stock by creating a distribution based on the
+   calculated document similarities from equation \eqref{doc:prob}
+	 Given this distribution it will then calculate the expected percentage
+   change by creating a sum of the percentage change weighted by
+   it's probability of it influencing a change, \(P(C | d_i)\).
 \end{description}
-We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
+We also implemented a caching layer to sit in from of solr so that we would
+be able to query solr for a massive amount of documents in a reasonable
+amount of time. This caching layer was created so that we can make quick
+changes to our prediction algorithm where our backing training/test documents will stay consistent.
 
 \subsubsection{Feature Retrieveal}
-Given either prediction implementation we needed to obtain values to for the percentage change of a stock price given a document and also the similarity score of a given document to another document.  The similarity score is defined above in equation \eqref{doc:sim}. \\
-The percentage change is simply described as the difference between the open and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
+Given either prediction implementation we needed to obtain values to for the
+percentage change of a stock price given a document and also the similarity
+score of a given document to another document. The similarity score
+is defined above in equation \eqref{doc:sim}. \\
+The percentage change is simply described as the difference between the open
+and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
 
 \subsection{Experimental results}
 \label{sec:experimental-results}
@@ -288,12 +318,12 @@ The percentage change is simply described as the difference between the open and
 %\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
 \begin{itemize}
 \item Experiment 1: We found that daily stock movements do not have a
-  baseline probability of 
+  baseline probability of
 \[
-  	P(\text{positive} | \text{Dataset}) \approx 50\%
+  	P(\text{\(d_i = positive\)} | \text{\(Dataset\)}) \approx 50\%
 \]
 \[
-	P(\text{negative} | \text{Dataset}) \approx 50\%
+  	P(\text{\(d_i = negative\)} | \text{\(Dataset\)}) \approx 50\%
 \]
   Instead there is a bias toward positive or negative depending on date of sample/distribution.
   Accordingly, it is not enough to know with high likelihood the direction a
