@@ -39,14 +39,18 @@ We created an algorithm that forecasts stock price changes from given news artic
 We pursued this algorithm because it's prediction could act as a hint as to
 whether a stock is about to increase or decrease. We used a
 text search algorithm to rank the tickers on document relevance. Then we created
- a kNN implementation to cluster the documents according to a positive or negative increase in the mentioned stock. \\  \\
+a kNN implementation to cluster the documents according to a positive or negative increase in the mentioned stock. \\  \\
 Our null hypothesis is that we would like to prove that calculating stock
-trends using news articles is more accurate than observing the stocks history.
+trends using the stockit algorithm is more accurate than a purely regressive model.
 
 \section{Background}
 \label{sec:background}
 %\instructions{Summarize and discuss related work that you are building on: this requires you to find, read and cite a few research papers. This is also something you can get started on as soon as you have settled on a task.} 
-  There have been other attempts to predict stock market prices using machine learning. For example, \href{http://ailab.arizona.edu/intranet/papers/Textual\%20Analysis\%20of\%20Stock\%20Market.pdf}{Textual Analysis of Stock Market Prediction Using Financial News Articles} approaches this challenge from a very similar direction. Their research has shown that text information can provide a 1\% to 2\% increase in accuracy of predicting the change in a stock price than a purely regressive model ~\cite{arizona}
+There have been other attempts to predict stock market prices using machine
+learning. For example, \href{http://ailab.arizona.edu/intranet/papers/Textual\%20Analysis\%20of\%20Stock\%20Market.pdf}{Textual Analysis of Stock Market Prediction Using Financial News Articles}
+approaches this challenge from a very similar direction. Their research has
+shown that text information can provide a 1\% to 2\% increase in accuracy of
+predicting the change in a stock price than a purely regressive model ~\cite{arizona}
 
 \section{Task and Data}
 \label{sec:taskAndData}
@@ -55,7 +59,11 @@ trends using news articles is more accurate than observing the stocks history.
 \subsection{The Task}
 \label{sec:task}
 %\instructions{Now, try to formalize your task as a classification/ranking/... problem. Introduce mathematical/formal notation as necessary. How do you evaluate models, or measure success?}
-In order to predict stock trends we will be using a k nearest neighbor algorithm that will cluster the documents.  This algorithm will first generate a similarity metric for all documents.  The similarity between documents will be calculated using the following scoring function as described in the Lucene Similarity implementation ~\cite{similarity}
+In order to predict stock trends we will be using a k nearest neighbor
+algorithm that will cluster the documents. This algorithm will
+first generate a similarity metric for all documents.
+The similarity between documents will be calculated using the
+following scoring function as described in the Lucene Similarity implementation ~\cite{similarity}
 \begin{equation}\label{doc:sim}
 	sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
 \end{equation}
