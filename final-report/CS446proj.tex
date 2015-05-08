@@ -140,35 +140,44 @@ Our model will be generated using a k-nearest neighbor clustering algorithm.  Us
 	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ dist(d,d_i) }{\sum^k_{j=1} dist(d, d_j)}
 \]
 \[
-	\text{perecentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i) 
+	\text{perecentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i)
 \]
 where
 \begin{description}
 	\item[\(P(C | d_i)\)] : The probability of a given document, \( i \) to contribute to the score resultant change of the document queried for.
 	\item[\textbf{\(dist(d,d_i)\)}] : \( \forall d, d_i, d_j \in D \) the distance between any two documents is described as
 	\[
-		dist(d, d') = score(d, d') \text{ where d represents the contents of an article } 
+		dist(d, d') = score(d, d') \text{ where d represents the contents of an article }
 	\]
 	\item[\(percentageChange(d)\)] : the estimated percentage change that an article will cause
 \end{description}
 
 \section{Experiments}
-\label{sec:experiments}
+%\label{sec:experiments}
+\begin{itemize}
+  \item Experiment 1: This our baseline experiment, the proposed model is
+  implemented and results are calculated.
+\end{itemize}
 
 \subsection{Experimental Hypotheses}
 \label{sec:exper-hypoth}
-\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
-Our model making the assumption that news documents correlate with the next day's
-stock price of the stock they mention. Specifically, our model proposes that
-similar news article documents to a new document will show the same or correlated
-stock price movement as that of the new document. This is accomplished by taking
-labeled news article documents (with stock ticker and $\%\delta$), and using
-a test similarity measurement as the distance in the KNN algorithm.
+%\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
+\begin{itemize}
+  \item Experiment 1: Our model making the assumption that news documents
+  correlate with the next day's stock price of the stock they mention.
+  Specifically, our model proposes that similar news article documents to a new
+  document will show the same or correlated stock price movement as that of the new document.
+\end{itemize}
 
 \subsection{Experimental setup}
 \label{sec:experimental-setup}
-\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
-List the models you will evaluate. Cite any existing tools or software you use to perform your experiments; describe what you implemented yourself. Describe how you obtained the features used by each of the models.}
+%\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
+\begin{itemize}
+  \item Experiment 1: This one split the documents into half training and half testing
+  chronologically (ordered by the publish date of the article). The test group
+  was then randomly shuffled and place into 5 folds. We used the training set as the
+  instances for KNN.
+\end{itemize}
 
 \subsection{Experimental results}
 \label{sec:experimental-results}
