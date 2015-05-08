@@ -35,8 +35,13 @@ We would like to given a set of articles create a similarity matrix between each
 %\instructions{This should be a brief outline of the paper -- use plain English, no math. Note that you should be able to write most of this section before you actually perform any experiments. First, define and motivate your task: what are you trying to learn, and why is this an important task? Second, define what kind of a machine learning problem this requires you to solve (binary/multiclass classification, ranking, ....). What is an appropriate baseline model for this task? What kind of model are you proposing? 
 %Briefly summarize the assumptions your model makes. Finally, describe the hypotheses you wish to test. These are typically statements of the form ``we expect model/features A to perform better on this task than model/features B''.
 %Outline how your experiments will evaluate these hypotheses (comparisons of different models, ablation studies, learning curves, oracle experiments... ). }
-We would like to create an algorithm that would be able to forecast stock price changes from a given news article content. This would help to test ways that one could predict a stock trend and could act as a hint as to whether a stock is about to increase or decrease.  We will be using a text search algorithm to rank the tickers on document relevance.  Then we will create a kNN implementation to cluster the documents according to a positive or negative increase in the mentioned stock. \\  \\
-Our null hypothesis is that we would like to prove that calculating stock trends using news articles is more accurate than observing the stocks history.
+We created an algorithm that forecasts stock price changes from given news article content.
+We pursued this algorithm because it's prediction could act as a hint as to
+whether a stock is about to increase or decrease. We used a
+text search algorithm to rank the tickers on document relevance. Then we created
+ a kNN implementation to cluster the documents according to a positive or negative increase in the mentioned stock. \\  \\
+Our null hypothesis is that we would like to prove that calculating stock
+trends using news articles is more accurate than observing the stocks history.
 
 \section{Background}
 \label{sec:background}
