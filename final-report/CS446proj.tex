@@ -93,9 +93,20 @@ where
 \subsection{The Data}
 \label{sec:data}
 %\instructions{Describe the data you use to train and evaluate your models. Describe where you got it from (include references/citations to published works, or URLs!). Describe and give examples for the features that you have access to.} 
-For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
-To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\  
-Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using the similarity function above. \\ \\ 
+For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr}
+instance to use as our datasource and text computing platform to
+handle the large amounts of data. We split our data into three datasets.
+This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
+To find relevant articles we were required to search the articles
+for a given ticker name and retrieve results whether the ticker
+was present or the name of the company. We used a synonyms file generated
+from the tickers that were present in the stocks dataset. We also used an
+implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\
+Using our three datasets we will create a fourth composite dataset that
+will be a document set that contains an article, the most relevant ticker,
+and the history for the day following the release of the article.
+We use a set of synonyms generated from our stock stockers from
+For a given query and a document we calculate the score using the similarity function above. \\ \\
 \begin{equation}\label{doc:score}
   	score(q,d) = sim(q, d)
 \end{equation}
