@@ -38,7 +38,7 @@ from the content of a news article.
 %Outline how your experiments will evaluate these hypotheses (comparisons of different models, ablation studies, learning curves, oracle experiments... ). }
 We created an algorithm that forecasts a stock price movement from news
 article content and historic stock prices.
-We pursued this algorithm because it's prediction could act as a hint as to
+We pursued this algorithm because it's prediction could act as an indicator to
 whether a stock is about to increase or decrease in price. We used a
 text search algorithm to rank the tickers on document relevance. Then we created
 a kNN implementation to cluster the documents according to a positive or
@@ -49,7 +49,7 @@ Two variations of this model will be tested:
 \begin{itemize}
 	\item A model with using the arithmetic mean of its kNN neighbors. This will
     require a base feature set of the percentage change for each document.
-	\item A probabilistic model using the similarity between documents as a
+	\item A probabilistic model uses the similarity between documents as a
     probability measure. It will use this probability to calculate the expectation of
     the stock price movement. This will require both the
     base feature set of the percentage change of a document as well
@@ -212,11 +212,16 @@ Using our data set D, we will take the k closest documents to the
 queried document, \(d\). The closest neighboring documents will be fetched by
 maximizing the text similarity between documents. Once we retrieve the
 nearest neighbors to a given document we will then calculate the predicted percentage change.
-\begin{equation}\label{doc:prob}
-	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ sim(d,d_i) }{\sum^k_{j=1} sim(d, d_j)}
-\end{equation}
 \begin{equation}\label{doc:pDelta}
 	\text{percentageChange}(d) = \mathlarger{\mathlarger{\sum}}^k_{i=1} P(C | d_i) \cdot \text{percentageChange}(d_i)
+\end{equation}
+For the baseline model:
+\begin{equation}\label{doc:prob}
+	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ 1 }{ k }
+\end{equation}
+For the probabilistic model:
+\begin{equation}\label{doc:prob}
+	 \forall i \in [1..k] \rightarrow P(C | d_i) = \frac{ sim(d,d_i) }{\sum^k_{j=1} sim(d, d_j)}
 \end{equation}
 where
 \begin{description}
@@ -238,25 +243,24 @@ where
 \label{sec:exper-hypoth}
 %\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
 \begin{itemize}
-  \item Experiment 1: Our model making the assumption that news documents
+  \item Experiment 1: Our model makes the assumption that news documents
   correlate with the next day's stock price of the stock they mention.
   Specifically, our model proposes that similar news article documents to a new
   document will show the same or correlated stock price movement as that of the new document.
-  \item Experiment 2: Our model making the assumption that news documents
-  correlate with the next day's stock price of the stock they mention.
-  Specifically, this model proposes that the document similarity score can be
-  used to calculate a more accurate prediction.
+  \item Experiment 2: Specifically, this model proposes that the
+  document similarity score can be used to form a probabilistic model to compute
+  a more accurate prediction.
 \end{itemize}
 
 \subsection{Experimental setup}
 \label{sec:experimental-setup}
 %\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
 \begin{description}
-  \item[\(Accuracy(Model, Dataset)\)] : \(|CorrectPredictions(Model, Dataset)| / |Dataset|\)
-  \item[\(P(Movement = positive | Dataset)\)] : \([\sum_{d \in Dataset} Sign(d)] / |Dataset|\)
-  \item[\(TotalAggCap(Model, Dataset)\)] : \(\sum_{d \in Dataset} AggressiveCapture(Model, d) \)
-  \item[\(AggressiveCapture(Prediction, d)\)] : \(Sign(Prediction) * d * \ln(e + |Prediction|) \)
-  \item[\(NetCapture(Prediction, d)\)] : \(Sign(Prediction) * d)\)
+  \item[\(accuracy(model, D)\)] : \(|D^+| / |D|\)
+  \item[\(P(d_i = positive | D)\)] : \([\sum_{d_i \in D} sign(d_i)] / |D|\)
+  \item[\(totalAggCap(model, dataset)\)] : \(\sum_{d_i \in D} aggressiveCapture(model, d_i) \)
+  \item[\(aggressiveCapture(prediction, d_i)\)] : \(sign(prediction) * d_i * \ln(e + |prediction|) \)
+  \item[\(netCapture(prediction, d_I)\)] : \(sign(prediction) * d)\)
 \end{description}
 
 \begin{itemize}
@@ -272,16 +276,26 @@ where
 For the purpose of this project we implemented a solr client to
 interface with our solr server. We then created a set of utilities to
 perform estimations for the percentage change of a document given it's
-neighbors.  Two implementations of our predictor were created for the
+neighbors. Two implementations of our predictor were created for the
 purpose of this project:
 \begin{description}
 	\item[Predictor]
-	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
-	 \item[WeightedPredictor]
-	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document similarities from equation \eqref{doc:prob}
-	 Given this distribution it will then calculate the expected percentage change by creating a sum of the percentage change weighted by it's probability of it influencing a change, \(P(C | d_i)\).
+	 This implementation predicts the percentage change of a stock given an
+   article by calculating the percentage change using the arithmetic mean.
+   Thus, for this we are simply calculating an expected value assuming a
+   uniform distribution. Equivalently, the mean of all the neighbors' percentage changes.
+	 \item[ExpectationPredictor]
+	 This implementation estimates the expected value of the percentage change
+   for a given stock by creating a distribution based on the
+   calculated document similarities from equation \eqref{doc:prob}
+	 Given this distribution it will then calculate the expected percentage
+   change by creating a sum of the percentage change weighted by
+   it's probability of it influencing a change, \(P(C | d_i)\).
 \end{description}
-We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
+We also implemented a caching layer to sit in from of solr so that we would
+be able to query solr for a massive amount of documents in a reasonable
+amount of time. This caching layer was created so that we can make quick
+changes to our prediction algorithm where our backing training/test documents will stay consistent.
 
 \subsubsection{Feature Retrieveal}
 Given either prediction implementation we needed to obtain values to for the
@@ -306,10 +320,10 @@ and close of the stock price for the correlated document as defined in equation 
 \item Experiment 1: We found that daily stock movements do not have a
   baseline probability of
 \[
-  	P(\text{positive} | \text{Dataset}) \approx 50\%
+  	P(\text{\(d_i = positive\)} | \text{\(Dataset\)}) \approx 50\%
 \]
 \[
-	P(\text{negative} | \text{Dataset}) \approx 50\%
+  	P(\text{\(d_i = negative\)} | \text{\(Dataset\)}) \approx 50\%
 \]
   Instead there is a bias toward positive or negative depending on date of sample/distribution.
   Accordingly, it is not enough to know with high likelihood the direction a
