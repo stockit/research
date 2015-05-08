@@ -27,7 +27,7 @@
 
 \begin{abstract}
 %\instructions{Very briefly, summarize your task, your model and your main results}
-We would like to given a set of articles create a similarity matrix between each document and then create a simple kNN clustering algorithm to predict the trend of a given stock.
+Stockit is an algorithm that forecasts the stock's price change from the content of a given news article.
 \end{abstract}
 
 \section{Introduction}
@@ -63,7 +63,7 @@ In order to predict stock trends we will be using a k nearest neighbor
 algorithm that will cluster the documents. This algorithm will
 first generate a similarity metric for all documents.
 The similarity between documents will be calculated using the
-following scoring function as described in the Lucene Similarity implementation ~\cite{similarity}
+following scoring function. ~\cite{similarity}
 \begin{equation}\label{doc:sim}
 	sim(d_i, d_j) = coord(d_i, d_j) \cdot queryNorm(d_i) \cdot \Sigma_{t \in d_i} \left[ tf(t \in d_j) \cdot idf(t)^2 \cdot norm(t,d_j) \right]
 \end{equation}
@@ -84,9 +84,13 @@ where
 	\item[KNN] : We implement KNN using the text similarity of the document to find its nearest neighbors. We use the
 	percentage change of the stock referenced in each neighbor to calculate a mean percentage change. This mean
 	percentage change is used as the prediction.
-	\item[Constraints] : We make sure to only use neighbors which are included in the test data. Accordingly, the percentage
-	change of the stock referenced in the document is calculated using the open/close price for the day after the
-	article was published. ~\cite{stock-matrix}
+	\item[Constraints] :
+    \begin{itemize}
+      \item We make sure to only use neighbors which are included in the training data.
+      \item price movement of the stock referenced in the document is calculated
+            using the next day's open/close price from the document
+            published date. ~\cite{stock-matrix}
+    \end{itemize}
 \end{description}
 
 
@@ -100,15 +104,15 @@ This solr instance is currently deployed to \href{http://solr.deepdishdev.com:89
 To find relevant articles we were required to search the articles
 for a given ticker name and retrieve results whether the ticker
 was present or the name of the company. We used a synonyms file generated
-from the tickers that were present in the stocks dataset. We also used an
-implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\
+from the tickers that were present in the stocks dataset. We also used Porter
+stemming ~\cite{porter} to improve search results. \\ \\
 Using our three datasets we will create a fourth composite dataset that
 will be a document set that contains an article, the most relevant ticker,
 and the history for the day following the release of the article.
 We use a set of synonyms generated from our stock stockers from
 For a given query and a document we calculate the score using the similarity function above. \\ \\
 \begin{equation}\label{doc:score}
-  	score(q,d) = sim(q, d)
+  	score(d_j, d_k) = sim(d_j, d_k)
 \end{equation}
 where \(V\) is a mapping function that translates both the query and document to a search vector \\ \\
  To find the most relevant ticker we will find the ticker for each article that has the highest correlated score.  This will give us a new composite dataset which we will use as our training and test data for our algorithm.
@@ -214,7 +218,7 @@ where
   \item[\(Accuracy(Model, Dataset)\)] : $|CorrectPredictions(Model, Dataset)| / |Dataset|$
   \item[\(P(Movement = positive | Dataset)\)] : $[\sum_{d \in Dataset} Sign(d)] / |Dataset|$
   \item[\(TotalAggCap(Model, Dataset)\)] : $\sum_{d \in Dataset} AggressiveCapture(Model, d) $
-  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * d * \ln(\epsilon + |Prediction|)$
+  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * d * \ln(e + |Prediction|)$
   \item[\(NetCapture(Prediction, d)\)] : $Sign(Prediction) * d)$
 \end{description}
 
