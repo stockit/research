@@ -135,12 +135,12 @@ Note that our model does not take this into effect.
 %\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
 One of the baseline models is the linear regression model. The predicted for a stock is given by
 \begin{equation}\label{pred:uniform}
-	\text{prediction}(s, i) \sum_{i=i}^{n} percentageChange(s, \text{day}(i)) / n
+	\text{prediction}(s, i) \mathlarger{ \mathlarger{ \sum } }_{i=i}^{n} \frac{\text{percentageChange}(s, \text{day}_i) }{ n }
 \end{equation}
-where
-\begin{description}
+where \begin{description}
 	\item[\textbf{s}] : A given stock in the set S which represents the set of all stocks in our dataset
 	\item[\textbf{\(\text{day}_i\)}] : A historic day for a given stock \(S\) 
+	\item[\textbf{n}] : The total number of days
 \end{description}
 This model provide a significant increase in accuracy compared to random chance.
 One paper created a model by using text mining with sparse matrix factorization. ~\cite{stock-matrix}
@@ -219,8 +219,7 @@ For the purpose of this project we implemented a solr client to interface with o
 We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
 
 \subsubsection{Feature Retrieveal}
-Given either prediction implementation we needed to obtain values to for the percentage change of a stock price given a document and also the similarity score of a given document to another document.  The similarity score is defined above in equation \eqref{doc:sim}. 
-
+Given either prediction implementation we needed to obtain values to for the percentage change of a stock price given a document and also the similarity score of a given document to another document.  The similarity score is defined above in equation \eqref{doc:sim}. \\
 The percentage change is simply described as the difference between the open and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
 
 \subsection{Experimental results}
@@ -236,7 +235,13 @@ The percentage change is simply described as the difference between the open and
 %\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
 \begin{itemize}
 \item Experiment 1: We found that daily stock movements do not have a
-  baseline probability of $P(positive | Dataset) ~ 50\% or P(negative | Dataset) ~ 50\%$.
+  baseline probability of 
+\[
+  	P(\text{positive} | \text{Dataset}) \approx 50\%
+\]
+\[
+	P(\text{negative} | \text{Dataset}) \approx 50\%
+\]
   Instead there is a bias toward positive or negative depending on date of sample/distribution.
   Accordingly, it is not enough to know with high likelihood the direction a
   stock is going to move on a given day to produce a profitable model. There
