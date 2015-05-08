@@ -80,7 +80,7 @@ where
 \subsection{The Data}
 \label{sec:data}
 %\instructions{Describe the data you use to train and evaluate your models. Describe where you got it from (include references/citations to published works, or URLs!). Describe and give examples for the features that you have access to.} 
-  For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
+For the purpose of this project we have set up a \href{http://lucene.apache.org/solr/}{solr} instance to use as our datasource and text computing platform to handle the large amounts of data.  We split our data into three datasets.  This solr instance is currently deployed to \href{http://solr.deepdishdev.com:8983/solr}{solr.deepdishdev.com/solr}. \\ \\
 To find relevant articles we were required to search the articles for a given ticker name and retrieve results whether the ticker was present or the name of the company.  We used a synonyms file generated from the tickers that were present in the stocks dataset. We also used an implementation of the Porter Stemmer algorithm ~\cite{porter} to improve search results. \\ \\  
 Using our three datasets we will create a fourth composite dataset that will be a document set that contains an article, the most relevant ticker, and the history for the day following the release of the article.  We use a set of synonyms generated from our stock stockers from   For a given query and a document we calculate the score using the similarity function above. \\ \\ 
 \begin{equation}\label{doc:score}
@@ -120,8 +120,8 @@ where \(V\) is a mapping function that translates both the query and document to
 The baseline model we will choose to measure against stockit is a simple random guess.
 50\% choose a positive price movement otherwise a negative price movement. This problem is a bit unique
 where simply classifying with high accuracy does not guarantee good real world accuracy. It is important that the \\ \\
-\begin{equation}\label{acc:constraint} 
-	\sum_{d}^{D_c}} \text{percentageChange}(d) > \sum_{d}^{D_{\text{in}}} \text{percentageChange}(d)
+\begin{equation}\label{acc:constraint}
+	\sum_{d}^{D_c} \text{percentageChange}(d) > \sum_{d}^{D_{\text{in}}} \text{percentageChange}(d)
 \end{equation}
 where
 \begin{description}
@@ -135,7 +135,7 @@ Note that our model does not take this into effect.
 %\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
 One of the baseline models is the linear regression model. The predicted for a stock is given by
 \begin{equation}\label{pred:uniform}
-	\text{prediction}(s, i) = \sum_{i=i}^{n} percentageChange(s, \(\text{day}_i) / n
+	\text{prediction}(s, i) \sum_{i=i}^{n} percentageChange(s, \text{day}(i)) / n
 \end{equation}
 where
 \begin{description}
@@ -167,20 +167,45 @@ where
 \end{description}
 
 \section{Experiments}
-\label{sec:experiments}
+%\label{sec:experiments}
+\begin{itemize}
+  \item Experiment 1: This our baseline experiment, the proposed model is
+  implemented and results are calculated.
+\end{itemize}
 
 \subsection{Experimental Hypotheses}
 \label{sec:exper-hypoth}
-\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
+%\instructions{Summarize the hypotheses (research questions) your experiments are designed to test (address). (Note that some of these hypotheses may emerge as you keep working on a problem; you will not necessarily have come up with all the questions you wish to address before you have started building a models for the specific task.}
+\begin{itemize}
+  \item Experiment 1: Our model making the assumption that news documents
+  correlate with the next day's stock price of the stock they mention.
+  Specifically, our model proposes that similar news article documents to a new
+  document will show the same or correlated stock price movement as that of the new document.
+\end{itemize}
 
 \subsection{Experimental setup}
 \label{sec:experimental-setup}
-\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
-List the models you will evaluate. Cite any existing tools or software you use to perform your experiments; describe what you implemented yourself. Describe how you obtained the features used by each of the models.}
+%\instructions{Define test/training/dev data splits, describe how you tuned performance. Describe and your evaluation metric, and define it mathematically.
+\begin{description}
+  \item[\(Accuracy(Model, Dataset)\)] : $|CorrectPredictions(Model, Dataset)| / |Dataset|$
+  \item[\(P(Movement = positive | Dataset)\)] : $[\sum_{d \in Dataset} Sign(d)] / |Dataset|$
+  \item[\(TotalAggCap(Model, Dataset)\)] : $\sum_{d \in Dataset} AggressiveCapture(Model, d) $
+  \item[\(AggressiveCapture(Prediction, d)\)] : $Sign(Prediction) * d * \ln(\epsilon + |Prediction|)$
+  \item[\(NetCapture(Prediction, d)\)] : $Sign(Prediction) * d)$
+\end{description}
 
-\subsubsection{Data splits}
-
-\subsubsection{Evaluation}
+\begin{itemize}
+  \item Experiment 1: This experiment split the documents into half training and half testing
+  chronologically (ordered by the publish date of the article). The test group
+  was then randomly shuffled and place into 5 folds. We used the training documents as the
+  instances for KNN.
+  \item Experiment 2: Given the results of the first experiment. We wanted to see
+  how the model would behave over time. This experiment split the documents into
+  four chronological segments testing chronologically (ordered by the publish
+  date of the article). Each segment was then split into half training and half testing
+  Again, the test group was then randomly shuffled and place into 5
+  folds.
+\end{itemize}
 
 \subsubsection{Tools/Software}
 For the purpose of this project we implemented a solr client to interface with our solr server.  We then created a set of utilities to perform estimations for the percentage change of a document given it's neighbors.  Two implementations of our predictor were created for the purpose of this project:
@@ -189,7 +214,6 @@ For the purpose of this project we implemented a solr client to interface with o
 	 This implementation predicts the percentage change of a stock given an article by calculating the percentage change using an assumed uniform distribution.  Thus, for this we are simply calculating an expected value which is the mean of all the neighbors' percentage changes.
 	 \item[WeightedPredictor]
 	 This implementation estimates the expected value of the percentage change for a given stock by creating a distribution based on the calculated document distances from equation \eqref{doc:prob}
-	 
 	 Given this distribution it will then calculate the expected percentage change by creating a sum of the percentage change weighted by it's probability of it influencing a change, \(P(C | d_i)\).
 \end{description}
 We also implemented a caching layer to sit in from of solr so that we would be able to query solr for a massive amount of documents in a reasonable amount of time.  This caching layer was created so that we can make quick changes to our prediction algorithm where our backing training/test documents will stay consistent.
@@ -199,13 +223,27 @@ Given either prediction implementation we needed to obtain values to for the per
 
 The percentage change is simply described as the difference between the open and close of the stock price for the correlated document as defined in equation \eqref{doc:pDelta}.
 
-
 \subsection{Experimental results}
 \label{sec:experimental-results}
-\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
+%\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
+\begin{itemize}
+\item Experiment 1: We received a mean accuracy of 45.63\% across the five folds.
+  The mean net capture was 0.1411. The mean aggressive capture was 0.2334.
+\item Experiment 2: TO DO
+\end{itemize}
 
 \section{Conclusion}
-\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
+%\instructions{Summarize your findings, and discuss their implications, e.g. for future work, or for related tasks. Discuss also the shortcomings of your proposed approach. }. 
+\begin{itemize}
+\item Experiment 1: We found that daily stock movements do not have a
+  baseline probability of $P(positive | Dataset) ~ 50\% or P(negative | Dataset) ~ 50\%$.
+  Instead there is a bias toward positive or negative depending on date of sample/distribution.
+  Accordingly, it is not enough to know with high likelihood the direction a
+  stock is going to move on a given day to produce a profitable model. There
+  was little correlation with folds with high accuracy (~65\%) and the
+  net aggressive capture.
+\item Experiment 2:
+\end{itemize}
 
 %\section*{\instructions{Bibliography}}
 %\instructions{Don't forget to create your own .bib file. If you call it {\tt mybib.bib} and put it in the same directory as this {\tt .tex} file, add {\tt$\backslash$bibliography\{mybib\}} before {\tt$\backslash$end\{document\}}
@@ -217,7 +255,7 @@ The percentage change is simply described as the difference between the open and
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
+%%% End:
