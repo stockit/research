@@ -309,12 +309,12 @@ and close of the stock price for the correlated document as defined in equation 
 \label{sec:experimental-results}
 %\instructions{Now give the actual experimental results (use figures/tables/graphs as appropriate), and discuss whether they verify or falsify your hypotheses. How important are the various features your models use (consider ablation studies). How robust are your results? (Look at learning curves, or the variance when you perform cross-validation). Can you perform an error analysis?}
 \begin{itemize}
-\item Experiment 2: We a mean accuracy of
+\item Experiment 2: This experiment has a mean accuracy of
   37.8141\%. Accordingly, the mean aggressive capture is -0.6713, 4.1497,
-  -1.2376, -0.5652, respectively for each time series (0.4189 mean).
-\item Experiment 2: We a mean accuracy of
+  -1.2376, -0.5652, respectively for each time series (0.4189 mean across series).
+\item Experiment 2: This experiment has a mean
   34.8881\%. Accordingly, the mean aggressive capture is 0.1008, 0.0686,
-  -0.3618, 0.1542, respectively for each time series (-0.0599 mean).
+  -0.3618, 0.1542, respectively for each time series (-0.0599 mean across series).
 \end{itemize}
 
 \section{Conclusion}
@@ -336,25 +336,26 @@ and close of the stock price for the correlated document as defined in equation 
   strongly coorelate with each other. Even though this experiment received a
   good result for the aggressive capture, it was caused by almost entirely from
   a single very strong day of trading.
-\item Experiment 2: Had a lower performance with a mean percentage of 34.8881\%.
+\item Experiment 2: Experiment 2 Had a lower performance with a mean percentage of 34.8881\%.
   It also has an aggressive capture of -0.0599. Accordingly, the time series
   data shows the algorithm's performance is
   highly dependant from the data within the given fold.
-\item Experiment 2:  The similarity score is not a probabilistic function. For example, it does not
+\item Experiment 2: The similarity score is not a probabilistic function. For example, it does not
   calculate probability that the document matches your query. Instead, the score
   provides a ranking. Using the score in a probability model did not
-  improve the results and lacks a theorhetical basis.
+  improve the results and lacks a theoretical basis.
 \item Summary:
 \begin{itemize}
-  \item Knowing the direction is not enough for profitability: It is interesting
-    to note that even though we can (with high accuracy) know the direction a
-    stock price may move for that day. It is not enough to produce a profitable
-    model. We need some idea of the magnitude of the change as well.
-  \item Even though a trading strategy does have high variance for a given run,
-    the strategy can have high overall variance : When running the experiment
+  \item Being able to know the direction a stock price movement with high probability
+    is not enough for profitability: It is interesting
+    to note that even though we can know with high probability the direction a
+    stock price for that day. It is not enough to produce a profitable
+    model. We need some idea of the magnitude of the change as well for that day.
+  \item Even though a trading strategy may not have high variance for a given fold,
+    the strategy can have high variance across folds: When running the experiment
     over the time series data, individual folds can move linearly and with low
     variance. Unfortunately, that data across folds produces a much higher
-    variance.
+    variance and shows the brittleness of the model.
 \end{itemize}
 
 %\section*{\instructions{Bibliography}}
