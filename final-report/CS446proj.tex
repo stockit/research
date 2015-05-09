@@ -194,7 +194,7 @@ Note that our model does not take this into effect.
 %\instructions{If people have worked on this task before, summarize (and cite) some of the existing models}
 One of the baseline models is the linear regression model. The prediction for a stock is given by
 \begin{equation}\label{pred:uniform}
-	\text{prediction}(s, i) \mathlarger{ \mathlarger{ \sum } }_{i=i}^{n} \frac{\text{percentageChange}(s, \text{day}_i) }{ n }
+	\text{prediction}(s, i) = \mathlarger{ \mathlarger{ \sum } }_{i=i}^{n} \frac{\text{percentageChange}(s, \text{day}_i) }{ n }
 \end{equation}
 where \begin{description}
 	\item[\textbf{s}] : A given stock in the set S which represents the set of all stocks in our dataset
