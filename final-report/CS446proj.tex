@@ -344,7 +344,17 @@ and close of the stock price for the correlated document as defined in equation 
   calculate probability that the document matches your query. Instead, the score
   provides a ranking. Using the score in a probability model did not
   improve the results and lacks a theorhetical basis.
-
+\item Summary:
+\begin{itemize}
+  \item Knowing the direction is not enough for profitability: It is interesting
+    to note that even though we can (with high accuracy) know the direction a
+    stock price may move for that day. It is not enough to produce a profitable
+    model. We need some idea of the magnitude of the change as well.
+  \item Even though a trading strategy does have high variance for a given run,
+    the strategy can have high overall variance : When running the experiment
+    over the time series data, individual folds can move linearly and with low
+    variance. Unfortunately, that data across folds produces a much higher
+    variance.
 \end{itemize}
 
 %\section*{\instructions{Bibliography}}
